@@ -23,6 +23,7 @@ class DrawGantt extends JFrame {   //그저 GUI 관심 ㄴㄴ
       setContentPane(contentPane);
       contentPane.setBackground(Color.WHITE);
       contentPane.setLayout(null);
+      setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       
       JPanel panel = new JPanel();
       panel.setBackground(Color.GRAY);
@@ -241,8 +242,10 @@ class DrawGantt extends JFrame {   //그저 GUI 관심 ㄴㄴ
       label_in[n][4].setText(""+(int)(10*sumWT/(double)n)/10.0);
       label_in[n][5].setText(""+(int)(10*sumRT/(double)n)/10.0);
       label_in[n][6].setText(""+(int)(10*sumRST/(double)n)/10.0);
-      
+
       timeLabel.setText(time + "  초");
       System.out.println(time);
+
+      this.revalidate();
    }
 }

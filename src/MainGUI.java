@@ -15,7 +15,8 @@ import java.util.Vector;
 public class MainGUI extends JFrame{
 	String []scheduler = {"FCFS", "SJF", "SRT",
 			"NPP", "PP", "RR", "HRN"};
-	int index = 0,indexL = -1, totaltime, n, tq, q;
+	int q; //시뮬레이션 동작 시간
+	int index = 0,indexL = -1, totaltime, n, tq;
     Vector<Program> pv = new Vector<Program>();
 	Vector<String> lv = new Vector<String>();
 	JList<String> list;
@@ -30,14 +31,16 @@ public class MainGUI extends JFrame{
 		c.setLayout(null);
 		
 		list = new JList<String>();
-		list.setBounds(10, 10, 332, 182);
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				JList<String> t = (JList<String>)e.getSource();
 				indexL = t.getSelectedIndex();
 			}
 		});
-		c.add(list);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 10, 332, 182);
+		scrollPane.setViewportView(list);
+		c.add(scrollPane);
 		
 		JButton button = new JButton("데이터 찾기");
 		button.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -45,12 +48,12 @@ public class MainGUI extends JFrame{
 		button.addActionListener(new FopenButtonAction());
 		c.add(button);
 		
-		JButton button_1 = new JButton("추가");
+		JButton button_1 = new JButton("삭제");
 		button_1.setBounds(348, 169, 76, 23);
 		button_1.addActionListener(new DeleteAction());
 		c.add(button_1);
 		
-		JButton button_2 = new JButton("삭제");
+		JButton button_2 = new JButton("추가");
 		button_2.setBounds(348, 140, 76, 23);
 		button_2.addActionListener(new CreateAction());
 		c.add(button_2);
@@ -118,7 +121,9 @@ public class MainGUI extends JFrame{
 			}
 			n = scanner.nextInt();
 
-			for(int i = 0; i < n; i++) {
+			int s = pv.size();	// 이전 리스트 사이즈
+
+			for(int i = s; i < n+s; i++) {
 				Program temp = new Program();
 				temp.programName = scanner.next();
 				temp.inTime = scanner.nextInt();
@@ -132,7 +137,7 @@ public class MainGUI extends JFrame{
 				temp.color = new Color(r, g, b);
 				pv.add(temp);
 			}
-			for(int i = 0; i < n; i++) 
+			for(int i = s; i < n+s; i++)
 				lv.add(pv.get(i).programName +" "+ pv.get(i).inTime +" "+ pv.get(i).leftTime +" "+ pv.get(i).priority);
 			list.setListData(lv);
 			tq = scanner.nextInt();
@@ -174,7 +179,7 @@ public class MainGUI extends JFrame{
 	}
 	class DeleteAction implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if(indexL >= 0 || indexL < lv.size()) {
+			if(indexL >= 0 && indexL < lv.size()) {
 				lv.remove(indexL);
 				pv.remove(indexL);
 				n--;
@@ -184,13 +189,100 @@ public class MainGUI extends JFrame{
 	}
 	class CreateAction implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			CreateData createData = new CreateData();
+		}
+	}
+	public void createDataAction(Program inputData) {
+		pv.add(inputData);
+		lv.add(inputData.programName +" "+ inputData.inTime +" "+ inputData.leftTime +" "+ inputData.priority);
+		list.setListData(lv);
+	}
+	class CreateData extends JFrame {
+		Font font = new Font("맑은 고딕", Font.BOLD, 10);
+		public CreateData() {
+			setTitle("Add Data");
+			setBounds(100, 100, 250, 200);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+			Container c = getContentPane();
+			c.setLayout(new FlowLayout());
+
+			Panel panel = new Panel();
+			panel.setBounds(0, 0, 220, 120);
+			c.add(panel);
+			panel.setLayout(new GridLayout(4,2,5,5));
+			
+			//프로세스 명
+			JLabel NameLabel1 = new JLabel("프로세스 이름");
+			NameLabel1.setFont(font);
+			NameLabel1.setForeground(Color.BLACK);
+			panel.add(NameLabel1);
+
+			TextField inputField1 = new TextField();
+			inputField1.setColumns(10);
+			panel.add(inputField1);
+
+			//도착 시간
+			JLabel NameLabel2 = new JLabel("도착 시간");
+			NameLabel2.setFont(font);
+			NameLabel2.setForeground(Color.BLACK);
+			panel.add(NameLabel2);
+
+			TextField inputField2 = new TextField();
+			inputField2.setColumns(10);
+			panel.add(inputField2);
+
+			//서비스 시간
+			JLabel NameLabel3 = new JLabel("서비스 시간");
+			NameLabel3.setFont(font);
+			NameLabel3.setForeground(Color.BLACK);
+			panel.add(NameLabel3);
+
+			TextField inputField3 = new TextField();
+			inputField3.setColumns(10);
+			panel.add(inputField3);
+
+			//우선 순위
+			JLabel NameLabel4 = new JLabel("우선 순위");
+			NameLabel4.setFont(font);
+			NameLabel4.setForeground(Color.BLACK);
+			panel.add(NameLabel4);
+
+			TextField inputField4 = new TextField();
+			inputField4.setColumns(10);
+			panel.add(inputField4);
+
+			//버튼
+			JButton cancelButton = new JButton("취소");
+			cancelButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					dispose();
+				}
+			});
+			c.add(cancelButton);
+
+			JButton addButton = new JButton("추가");
+			addButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Program inputData = new Program();
+					inputData.programName = inputField1.getText();
+					inputData.inTime = Integer.parseInt(inputField2.getText());
+					inputData.leftTime = Integer.parseInt(inputField3.getText());
+					inputData.priority = Double.parseDouble(inputField4.getText());
+					createDataAction(inputData);
+					dispose();
+				}
+			});
+			c.add(addButton);
+
+			setVisible(true);
 		}
 	}
 	class ProcessTextAction implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			JTextField t = (JTextField)e.getSource();
-			
 		}
 	}
 	class ExeButtonAction implements ActionListener {
